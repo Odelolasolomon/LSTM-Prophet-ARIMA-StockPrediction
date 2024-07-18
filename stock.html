@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Price Prediction</title>
+</head>
+<body>
+    <h1>Stock Price Prediction</h1>
+    <form id="prediction-form">
+        <label for="num_future_steps">Number of Future Steps:</label>
+        <input type="number" id="num_future_steps" name="num_future_steps" required><br>
+        <button type="button" onclick="getPrediction()">Predict</button>
+    </form>
+    <h2>Predictions</h2>
+    <pre id="predictions-output"></pre>
+    <img id="graph-output" src="" alt="Prediction Graph" />
+    <script>
+        async function getPrediction() {
+            const numFutureSteps = document.getElementById('num_future_steps').value;
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({num_future_steps: numFutureSteps})
+            });
+            const data = await response.json();
+            if (data.error) {
+                document.getElementById('predictions-output').innerText = data.error;
+            } else {
+                document.getElementById('predictions-output').innerText = data.predictions.join('\n');
+                document.getElementById('graph-output').src = 'data:image/png;base64,' + data.graph;
+            }
+        }
+    </script>
+</body>
+</html>
